@@ -1,0 +1,86 @@
+version: '3.7'
+
+services:
+  #
+  # build
+  #
+  isc-kea-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    image: takumi/isc-kea:build
+    hostname: isc-kea-build
+    container_name: isc-kea-build
+    command: /bin/true
+
+  #
+  # api service
+  #
+  isc-kea-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    image: takumi/isc-kea:api
+    hostname: isc-kea-api
+    container_name: isc-kea-api
+    restart: always
+    network_mode: host
+    volumes:
+      - ./config-api:/etc/kea
+      - isc-kea-api-data:/var/lib/kea
+    environment:
+      - "ISC_KEA_UID=${KEA_UID:-1000}"
+      - "ISC_KEA_GID=${KEA_GID:-1000}"
+      - "ISC_KEA_DEBUG=${KEA_GID:-0}"
+
+  #
+  # dhcp4 service
+  #
+  isc-kea-dhcp4:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dhcp4
+    image: takumi/isc-kea:dhcp4
+    hostname: isc-kea-dhcp4
+    container_name: isc-kea-dhcp4
+    restart: always
+    network_mode: host
+    volumes:
+      - ./config-dhcp4:/etc/kea
+      - isc-kea-dhcp4-data:/var/lib/kea
+    environment:
+      - "ISC_KEA_UID=${KEA_UID:-1000}"
+      - "ISC_KEA_GID=${KEA_GID:-1000}"
+      - "ISC_KEA_DEBUG=${KEA_GID:-0}"
+
+  #
+  # dhcp6 service
+  #
+  isc-kea-dhcp6:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dhcp6
+    image: takumi/isc-kea:dhcp6
+    hostname: isc-kea-dhcp6
+    container_name: isc-kea-dhcp6
+    restart: always
+    network_mode: host
+    volumes:
+      - ./config-dhcp6:/etc/kea
+      - isc-kea-dhcp6-data:/var/lib/kea
+    environment:
+      - "ISC_KEA_UID=${KEA_UID:-1000}"
+      - "ISC_KEA_GID=${KEA_GID:-1000}"
+      - "ISC_KEA_DEBUG=${KEA_GID:-0}"
+
+volumes:
+  isc-kea-api-data:
+    name: isc-kea-api-data
+  isc-kea-dhcp4-data:
+    name: isc-kea-dhcp4-data
+  isc-kea-dhcp6-data:
+    name: isc-kea-dhcp6-data
